@@ -5,7 +5,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\HandlerStack;
 use Kevinrob\GuzzleCache\CacheMiddleware;
-use Kevinrob\GuzzleCache\Strategy\PublicCacheStrategy;
+use Kevinrob\GuzzleCache\Strategy\GreedyCacheStrategy;
 use LaunchDarkly\FeatureFlag;
 use LaunchDarkly\FeatureRequester;
 use LaunchDarkly\LDClient;
@@ -35,7 +35,7 @@ class GuzzleFeatureRequester implements FeatureRequester
         $this->_logger = $options['logger'];
         $stack = HandlerStack::create();
         if (class_exists('Kevinrob\GuzzleCache\CacheMiddleware')) {
-            $stack->push(new CacheMiddleware(new PublicCacheStrategy(isset($options['cache']) ? $options['cache'] : null)), 'cache');
+            $stack->push(new CacheMiddleware(new GreedyCacheStrategy(isset($options['cache']) ? $options['cache'] : null, 180)), 'cache');
         } elseif (!$this->_loggedCacheNotice) {
             $this->_logger->info("GuzzleFeatureRequester is not using an HTTP cache because Kevinrob\GuzzleCache\CacheMiddleware was not installed");
             $this->_loggedCacheNotice = true;
